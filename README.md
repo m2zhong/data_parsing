@@ -1,7 +1,5 @@
 # Data Parsing
 
-# Description
-
 This program reads two input files with information in
 <AS1> <AS2> <rel> and <AS> <num_router> format respectively.
 It then calculate the degree and number of router for 
