@@ -22,11 +22,11 @@ public class Output {
 	public static void main (String[] args) {
 		File f1, f2, output;
 		JFileChooser fc = new JFileChooser();
-		String key;
 		String buffStr = "";
-		String[] buffArr;
+		String[] stringArr;
 		Hashtable<String, Integer> hash = new Hashtable<String, Integer>();
 		Integer degree = 1; 
+		Integer degree2 = 1;
 
 		/* Prompting user for first file selection*/
 		System.out.println("Please select FIRST DATASET (Links).");
@@ -42,62 +42,59 @@ public class Output {
 			Scanner scanner = new Scanner(f1);		//for links file
 			Scanner scanner2 = new Scanner(f2);		//for router file
 
+
 			/* Read until End Of File */
-			while(scanner.hasNext()){
-				buffStr = scanner.next();
+			while(scanner.hasNextLine()){
 
-				/* Ommitting AS-to-AS rel as input. Not needed for 
-				calculation*/
-				if (!buffStr.equals("0") && !buffStr.equals("1") &&
-					!buffStr.equals("2") && !buffStr.equals("3")){
+				buffStr = scanner.nextLine();
+				stringArr = buffStr.split(" ", 3);
 
-					/* Updating degree count for visited AS nodes*/
-					if(hash.get(buffStr) != null){
-						degree = hash.get(buffStr);
-						degree++;
-					}
+				/* Updating degree count for visited AS nodes*/
+				if(hash.get(stringArr[0]) != null ){
+					degree = hash.get(stringArr[0]);
+					degree++;
 
-					/* Initializing degree count for unvisited AS nodes*/
-					else{
-						degree = 1;
-					}
+				}
+				else
+					degree = 1;
 
-					hash.put(buffStr, degree);
+				if(hash.get(stringArr[1]) != null){
+					degree2 = hash.get(stringArr[1]);
+					degree2++;
 				}
 
-				else
-					continue;	
+				/* Initializing degree count for unvisited AS nodes*/
+				else{
+					degree2 = 1;
+				}
+
+				hash.put(stringArr[0], degree);
+				hash.put(stringArr[1], degree2);
+
 			}
 
 			/* Creating output file, and file writer */
-			output = new File("./output.txt");
-			FileWriter fw = new FileWriter(output);
+			output = new File("output.txt");
+			PrintWriter pw = new PrintWriter(output);
 
 			/* Reading through router file */
 			while(scanner2.hasNextLine()){
-
 				/* Isolating AS number and router count */
 				buffStr = scanner2.nextLine();
-				buffArr = buffStr.split(" ", 2);
-
+				stringArr = buffStr.split(" ", 2);
 
 				/* Cross-checking for ASNs present in BOTH files */
-				if (hash.get(buffArr[0]) != null){
-					fw.write(buffArr[0] + " " + hash.get(buffArr[0]) + 
-						" " + buffArr[1] + '\n');
+				if (hash.get(stringArr[0]) != null){
+					pw.println(stringArr[0] + " " + hash.get(stringArr[0]) + 
+						" " + stringArr[1].trim());
 				}
-
-				else
-					continue;
 			}
 
-			/* Creating output file */
-			output.createNewFile();
+			/* closing print writer*/
+			pw.close();
 
 			/* Telling user where file is stored */
-			System.out.println("File saved at: " + fc.getCurrentDirectory());
-
-		} catch(Exception e){
-			e.printStackTrace();}
-		}
+			System.out.println("File saved as: " + output.getAbsolutePath());
+		} catch(Exception e){e.printStackTrace();}
 	}
+}
